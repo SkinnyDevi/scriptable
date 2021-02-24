@@ -9,3 +9,6 @@ Repository containing Scriptable scripts and iOS 14 Widgets
 - Copy and paste script to a new script in Scriptable
 - Done!
 ![alt 9animeWidget on Homescreen](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
+
+### Future updates and features to include
+- Notify when a user provided anime has been released
