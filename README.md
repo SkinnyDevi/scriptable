@@ -8,5 +8,12 @@ Repository containing Scriptable scripts and iOS 14 Widgets
 - Done!
 ![alt 9animeWidget on Homescreen](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
 
-### Future updates and features to include
+### Future updates and features to include (in order)
 - Notify when a user provided anime has been released
+- Complex widget version (currently only available in Large): displays 5 latest animes with thumbnails
+- Simple widget version: only a list of new animes, no thumbnails
+- Large simple widget
+- Medium complex widget
+- Medium simple widget
+- Small complex widget
+- Small simple widget
