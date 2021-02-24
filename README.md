@@ -8,7 +8,6 @@ Repository containing Scriptable scripts and iOS 14 Widgets
 - Place inside thew newly created folder the downloaded file 'widgetBG.JPG'
 - Copy and paste script to a new script in Scriptable
 - Done!
-- [this folder](https://www.google.com "Google's Homepage")
 ![alt 9animeWidget on Homescreen](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
 
 ### Future updates and features to include
