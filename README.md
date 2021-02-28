@@ -12,7 +12,7 @@ Repository containing Scriptable scripts and iOS 14 Widgets
 - Choose to send notifications for your favourite animes with a custom user anime list!
 - Sizes available right now: Large.
 
-***Note: the widget refreshes every 15 minutes (unless refreshed manually) due to iOS 14's limitations. Notifications and releases may or may not have a 15 minute difference. ***
+*__Note: the widget refreshes every 15 minutes (unless refreshed manually) due to iOS 14's limitations. Notifications and releases may or may not have a 15 minute difference. __*
 ![alt 9animeWidget on Homescreen](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
 ![alt 9animeWidget notifications](https://github.com/SkinnyDevi/scriptable/blob/main/images/notifications.jpg)
 
