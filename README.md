@@ -20,6 +20,7 @@ Repository containing Scriptable scripts and iOS 14 Widgets
 - ~~Notify when a user provided anime has been released~~
 - Complex widget version (currently only available in Large): displays 5 latest animes with thumbnails
 - Simple widget version: only a list of new animes, no thumbnails
+- ~~Large complex widget~~
 - Large simple widget
 - Medium complex widget
 - Medium simple widget
