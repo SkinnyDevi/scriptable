@@ -229,12 +229,9 @@ async function createLSimpleWidget(data) {
   var refreshDate = Date.now() + 1000 * 60 * REFRESH_RATE;
   widget.refreshAfterDate = new Date(refreshDate);
 
-  let req = new Request(data[0].image);
-  let latestImage = await req["loadImage"](data[0].image);
+  let latestImage = await new Request(data[0].image).loadImage();
 
-  const widgetBG = Image.fromFile(
-    `${FileManager.iCloud().documentsDirectory()}/animeWidget/widgetBG.JPG`
-  );
+  const widgetBG = await new Request(WIDGET_BG).loadImage();
 
   widget.backgroundImage = widgetBG;
   widget.url = ANIME_URL;
@@ -245,31 +242,27 @@ async function createLSimpleWidget(data) {
   let latestInfoStack = latestStack.addStack();
   latestInfoStack.layoutHorizontally();
   let latestTitleStack = latestInfoStack.addStack();
-  let latestTitle = addText(
-    latestTitleStack,
-    "1. " + data[0].title,
-    latestFont
-  );
+  addText(latestTitleStack, "1. " + data[0].title, latestFont);
   let latestPadFormatter = 35;
-  if (data[0].title.length < 10) {
-    latestPadFormatter = 76;
-  } else if (data[0].title.length < 17) {
-    latestPadFormatter = 52;
-  }
+  if (data[0].title.length < 10) latestPadFormatter = 76;
+  else if (data[0].title.length < 17) latestPadFormatter = 52;
   latestTitleStack.setPadding(35, latestPadFormatter, 0, 0);
   let anime1ImgStack = latestInfoStack.addStack();
   anime1ImgStack.layoutVertically();
-  let anime1Thumb = addImage(anime1ImgStack, latestImage, latestAnimeSize, 24);
+  addImage(anime1ImgStack, latestImage, latestAnimeSize, 24);
   let anime1ImgText = anime1ImgStack.addStack();
   let anime1Ep = anime1ImgText.addText(data[0].episode);
   anime1Ep.font = animeFont;
   let latestEpPadding = 30;
-  if (data[0].episode.length == 5) {
-    latestEpPadding = 25;
-  } else if (data[0].episode.length == 6) {
-    latestEpPadding = 19;
-  } else if (data[0].episode.length == 7) {
-    latestEpPadding = 21;
+  switch (data[0].episode.length) {
+    case 5:
+      latestEpPadding = 25;
+      break;
+    case 6:
+      latestEpPadding = 19;
+      break;
+    case 7:
+      latestEpPadding = 21;
   }
   anime1ImgText.setPadding(0, latestEpPadding, 5, 0);
 
@@ -294,28 +287,22 @@ async function createLSimpleWidget(data) {
   let hours = "";
   let minutes = "";
 
-  if (newDate.getHours() < 10) {
-    hours = "0" + newDate.getHours();
-  } else {
-    hours = newDate.getHours();
-  }
+  if (newDate.getHours() < 10) hours = "0" + newDate.getHours();
+  else hours = newDate.getHours();
 
-  if (newDate.getMinutes() < 10) {
-    minutes = "0" + newDate.getMinutes();
-  } else {
-    minutes = newDate.getMinutes();
-  }
+  if (newDate.getMinutes() < 10) minutes = "0" + newDate.getMinutes();
+  else minutes = newDate.getMinutes();
 
   let timeStamp = hours + ":" + minutes;
   timeStamp = "Last Refresh: " + timeStamp;
-  let refreshTime = addText(refreshTimeStack, timeStamp, refreshTimeFont);
+  addText(refreshTimeStack, timeStamp, refreshTimeFont);
 
   refreshTimeStack.addSpacer();
-
   widget.addSpacer(16);
 
   return widget;
 }
+
 // ---------Get Latest Anime ---------------
 async function getLatestAnime(num) {
   let animeHTML = await new Request(ANIME_URL).loadString();
@@ -365,7 +352,6 @@ async function getLatestAnime(num) {
       image: imgUrl,
       link: ANIME_URL + url,
     };
-    console.log(json);
     animes.push(json);
   }
 
@@ -374,30 +360,18 @@ async function getLatestAnime(num) {
 
 // ---------------Other Tools-------------------
 async function getWidget(s, dim) {
-  let widgetSize = config.widgetFamily || dim;
-  let widget;
-  let latestAnimes;
-  if (s) {
-    if (widgetSize == "small") {
-      widget = console.log("s small widget");
-    } else if (widgetSize == "medium") {
-      widget = console.log("s medium widget");
-    } else {
-      latestAnimes = await getLatestAnime(7);
-      widget = await createLSimpleWidget(latestAnimes);
-    }
-  } else {
-    if (widgetSize == "small") {
-      widget = console.log("small widget");
-    } else if (widgetSize == "medium") {
-      widget = console.log("medium widget");
-    } else {
-      latestAnimes = await getLatestAnime(5);
-      widget = await createLComplexWidget(latestAnimes);
-    }
+  const widgetSize = config.widgetFamily || dim;
+  switch (widgetSize) {
+    case "small":
+      return s ? console.log("s small widget") : console.log("small widget");
+    case "medium":
+      return s ? console.log("s medium widget") : console.log("medium widget");
+    default:
+      let latestAnimes = await getLatestAnime(s ? 7 : 5);
+      return s
+        ? await createLSimpleWidget(latestAnimes)
+        : await createLComplexWidget(latestAnimes);
   }
-
-  return widget;
 }
 
 function addImage(stack, image, size, roundness) {
@@ -412,9 +386,8 @@ async function presentAlert(prompt, items) {
   let alert = new Alert();
   alert.message = prompt;
 
-  for (const item of items) {
-    alert.addAction(item);
-  }
+  for (const item of items) alert.addAction(item);
+
   let resp = await alert.presentSheet();
   return resp;
 }
@@ -441,17 +414,12 @@ function createNotification(data) {
 
 function userAnimesLower(userAnimes) {
   let newUserAnimes = [];
-  for (let anime of userAnimes) {
-    anime = anime.toLowerCase();
-    newUserAnimes.push(anime);
-  }
-
+  for (let anime of userAnimes) newUserAnimes.push(anime.toLowerCase());
   return newUserAnimes;
 }
 
 function latestAnimeCheck(newAnimes) {
   const currentAnimeJSON = `${FileManager.iCloud().documentsDirectory()}/animeWidget/currentAnime.json`;
-
   let currentAnime = newAnimes[0];
 
   let animeFromJSON = JSON.parse(
@@ -459,13 +427,11 @@ function latestAnimeCheck(newAnimes) {
   );
 
   let notif = null;
-  if (animeFromJSON.title != currentAnime.title) {
+  if (animeFromJSON.title !== currentAnime.title) {
     let userAnimesLow = userAnimesLower(animeNotifs);
-    let titleLow = newAnimes[0].title.toLowerCase();
 
-    if (userAnimesLow.indexOf(titleLow) > -1) {
+    if (userAnimesLow.indexOf(currentAnime.title.toLowerCase()) > -1)
       notif = createNotification(newAnimes);
-    }
 
     FileManager.iCloud().writeString(
       currentAnimeJSON,
@@ -477,15 +443,10 @@ function latestAnimeCheck(newAnimes) {
 }
 
 function simpleCheck(parameters) {
-  let x = false;
-  if (parameters != null) {
-    parameters = parameters.toLowerCase();
-    if (parameters == "true") {
-      x = true;
-    }
-  }
+  if (parameters === null) return false;
 
-  return x;
+  parameters = parameters.toLowerCase();
+  if (parameters === "true") return true;
 }
 
 function fileCheck() {
@@ -493,9 +454,7 @@ function fileCheck() {
   let dirPath = fm.documentsDirectory();
   let filePath = fm.joinPath(dirPath, "/animeWidget/currentAnime.json");
 
-  let exists = fm.fileExists(filePath);
-
-  if (!exists) {
+  if (!fm.fileExists(filePath)) {
     let json = {
       title: "anime",
       episode: "episode",
