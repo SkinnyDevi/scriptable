@@ -12,7 +12,7 @@ let simple = simpleCheck(args.widgetParameter);
 let notifyCheck = latestAnimeCheck(await getLatestAnime(5));
 
 const WIDGET_BG =
-  "https://raw.githubusercontent.com/SkinnyDevi/scriptable/main/Anime%20Notifier/animeWidget/genericBG-u.png";
+  "https://raw.githubusercontent.com/SkinnyDevi/scriptable/main/Anime%20Notifier/backgrounds/genericBG-u.png";
 
 notifyFileSync(); // important for notifications, do not touch
 
