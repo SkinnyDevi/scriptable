@@ -12,9 +12,9 @@
 	- Simple widget version: displays only a list of the latest animes, no thumbnails
 
 ***Note: the widget refreshes every 15 minutes (unless refreshed manually) due to iOS 14+'s limitations. Notifications and releases may or may not have a 15 minute difference, or not appear if the anime is not the first at refresh time.***
-![alt Anime Notifier on Homescreen with 9animeBG](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
 ![alt Anime Notifier on Homescreen](https://github.com/SkinnyDevi/scriptable/blob/main/images/genericLarge.jpg)
 ![alt Anime Notifier on Homescreen (Simple)](https://github.com/SkinnyDevi/scriptable/blob/main/images/genericSimple.jpg)
+![alt Anime Notifier on Homescreen with 9animeBG](https://github.com/SkinnyDevi/scriptable/blob/main/images/9animeWidget.jpg)
 ![alt Anime Notifier notifications](https://github.com/SkinnyDevi/scriptable/blob/main/images/notifications.jpg)
 
 ## Future updates and features to include (in order)
