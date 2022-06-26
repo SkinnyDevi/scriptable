@@ -5,7 +5,7 @@
 const animeNotifs = [];
 
 // --------------Main Code--------------
-const ANIME_URL = "https://goload.pro";
+const ANIME_URL = "https://goload.pro"; // main source, do not touch
 const REFRESH_RATE = 1; // mins
 
 let simple = simpleCheck(args.widgetParameter);
@@ -14,12 +14,10 @@ let notifyCheck = latestAnimeCheck(await getLatestAnime(5));
 const WIDGET_BG =
   "https://raw.githubusercontent.com/SkinnyDevi/scriptable/main/Anime%20Notifier/animeWidget/genericBG-u.png";
 
-fileCheck(); // DO NOT TOUCH
+notifyFileSync(); // important for notifications, do not touch
 
 if (config.runsInWidget) {
-  if (notifyCheck != null) {
-    await notifyCheck.schedule();
-  }
+  if (notifyCheck != null) await notifyCheck.schedule();
 
   let widget = await getWidget(simple);
   Script.setWidget(widget);
@@ -30,26 +28,28 @@ if (config.runsInWidget) {
     "View Large Widget",
     "Cancel Display",
   ];
-  let chooser = await presentAlert("Preview Widget", displays);
 
+  let chooser = await presentAlert("Preview Widget", displays);
   if (chooser == displays.length - 1) return;
 
   let size = "";
   let widget;
-  if (displays[chooser] == displays[0]) {
-    size = "Small";
-    widget = await getWidget(simple, "small");
-  } else if (displays[chooser] == displays[1]) {
-    size = "Medium";
-    widget = await getWidget(simple, "medium");
-  } else {
-    size = "Large";
-    widget = await getWidget(simple);
+  switch (displays[chooser]) {
+    case displays[0]:
+      size = "Small";
+      widget = await getWidget(simple, "small");
+      break;
+    case displays[1]:
+      size = "Medium";
+      widget = await getWidget(simple, "medium");
+      break;
+    default:
+      size = "Large";
+      widget = await getWidget(simple);
+      break;
   }
 
-  if (notifyCheck != null) {
-    await notifyCheck.schedule();
-  }
+  if (notifyCheck != null) await notifyCheck.schedule();
 
   await widget[`present${size}`]();
 }
@@ -191,19 +191,7 @@ async function createLComplexWidget(data) {
   let refreshTimeStack = widget.addStack();
   refreshTimeStack.layoutHorizontally();
 
-  let newDate = new Date();
-  let hours = "";
-  let minutes = "";
-
-  if (newDate.getHours() < 10) hours = "0" + newDate.getHours();
-  else hours = newDate.getHours();
-
-  if (newDate.getMinutes() < 10) minutes = "0" + newDate.getMinutes();
-  else minutes = newDate.getMinutes();
-
-  let timeStamp = hours + ":" + minutes;
-  timeStamp = "Last Refresh: " + timeStamp;
-  addText(refreshTimeStack, timeStamp, refreshTimeFont);
+  getTimeRefreshStack(refreshTimeStack, refreshTimeFont);
 
   refreshTimeStack.addSpacer(16);
   widget.addSpacer(12);
@@ -283,19 +271,7 @@ async function createLSimpleWidget(data) {
   let refreshTimeStack = widget.addStack();
   refreshTimeStack.layoutHorizontally();
 
-  let newDate = new Date();
-  let hours = "";
-  let minutes = "";
-
-  if (newDate.getHours() < 10) hours = "0" + newDate.getHours();
-  else hours = newDate.getHours();
-
-  if (newDate.getMinutes() < 10) minutes = "0" + newDate.getMinutes();
-  else minutes = newDate.getMinutes();
-
-  let timeStamp = hours + ":" + minutes;
-  timeStamp = "Last Refresh: " + timeStamp;
-  addText(refreshTimeStack, timeStamp, refreshTimeFont);
+  getTimeRefreshStack(refreshTimeStack, refreshTimeFont);
 
   refreshTimeStack.addSpacer();
   widget.addSpacer(16);
@@ -346,13 +322,12 @@ async function getLatestAnime(num) {
     let url = animeRAW.slice(urlStart);
     url = url.slice(0, url.indexOf('">'));
 
-    let json = {
+    animes.push({
       title: name,
       episode: episode,
       image: imgUrl,
       link: ANIME_URL + url,
-    };
-    animes.push(json);
+    });
   }
 
   return animes;
@@ -449,7 +424,7 @@ function simpleCheck(parameters) {
   if (parameters === "true") return true;
 }
 
-function fileCheck() {
+function notifyFileSync() {
   let fm = FileManager.iCloud();
   let dirPath = fm.documentsDirectory();
   let filePath = fm.joinPath(dirPath, "/animeWidget/currentAnime.json");
@@ -465,4 +440,16 @@ function fileCheck() {
     json = JSON.stringify(json);
     fm.writeString(filePath, json);
   }
+}
+
+function getTimeRefreshStack(stack, font) {
+  let newDate = new Date();
+  let hours =
+    newDate.getHours() < 10 ? "0" + newDate.getHours() : newDate.getHours();
+  let minutes =
+    newDate.getMinutes() < 10
+      ? "0" + newDate.getMinutes()
+      : newDate.getMinutes();
+
+  addText(stack, "Last Refresh: " + hours + ":" + minutes, font);
 }
