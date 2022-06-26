@@ -1,4 +1,4 @@
-# Anime Notifier - iOS 14+ (Updared to iOS 16)
+# Anime Notifier - iOS 14+ (Updated to iOS 16)
 
 ## Features (1.6.0)
 - Show the latest five animes with thumbnails
