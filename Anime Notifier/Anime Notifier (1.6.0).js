@@ -2,7 +2,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: purple; icon-glyph: hamsa;
 // -------------User Config-------------
-const animeNotifs = [];
+const NOTIFY_ME = [];
 
 // --------------Main Code--------------
 const ANIME_URL = "https://goload.pro"; // main source, do not touch
@@ -403,7 +403,7 @@ function latestAnimeCheck(newAnimes) {
 
   let notif = null;
   if (animeFromJSON.title !== currentAnime.title) {
-    let userAnimesLow = userAnimesLower(animeNotifs);
+    let userAnimesLow = userAnimesLower(NOTIFY_ME);
 
     if (userAnimesLow.indexOf(currentAnime.title.toLowerCase()) > -1)
       notif = createNotification(newAnimes);
