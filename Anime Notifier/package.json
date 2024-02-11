@@ -1,0 +1,23 @@
+{
+	"name": "anime_notifier_widget",
+	"version": "1.6.1",
+	"description": "A widget that shows latest released anime.",
+	"type": "module",
+	"scripts": {
+		"start": "tsc -w"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/SkinnyDevi/scriptable.git"
+	},
+	"author": "SkinnyDevi",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/SkinnyDevi/scriptable/issues"
+	},
+	"homepage": "https://github.com/SkinnyDevi/scriptable#readme",
+	"dependencies": {
+		"nios-scriptable": "^1.0.1",
+		"typescript": "^5.3.3"
+	}
+}

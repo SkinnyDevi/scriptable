@@ -1,66 +1,155 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: purple; icon-glyph: hamsa;
+// version: 1.6.1
+
+import {
+  args,
+  config,
+  Script,
+  ListWidget,
+  Request,
+  Font,
+  Size,
+  WidgetStack,
+  ImageType,
+  Alert,
+  Notification,
+  FileManager,
+} from "nios-scriptable";
+
 // -------------User Config-------------
-const NOTIFY_ME = [];
+const NOTIFY_ME: string[] = [];
+const REFRESH_RATE = 1; // mins
 
 // --------------Main Code--------------
 const ANIME_URL = "https://goload.pro"; // main source, do not touch
-const REFRESH_RATE = 1; // mins
-
-let simple = simpleCheck(args.widgetParameter);
-let notifyCheck = latestAnimeCheck(await getLatestAnime(5));
 
 const WIDGET_BG =
   "https://raw.githubusercontent.com/SkinnyDevi/scriptable/main/Anime%20Notifier/backgrounds/genericBG-u.png";
 
-notifyFileSync(); // important for notifications, do not touch
+async function mainScript() {
+  const simple = simpleCheck(args.widgetParameter);
+  let notifyCheck = latestAnimeCheck(await getLatestAnime(5));
 
-if (config.runsInWidget) {
-  if (notifyCheck != null) await notifyCheck.schedule();
+  notifyFileSync(); // important for notifications, do not touch
 
-  let widget = await getWidget(simple);
-  Script.setWidget(widget);
-} else {
-  const displays = [
-    "View Small Widget",
-    "View Medium Widget",
-    "View Large Widget",
-    "Cancel Display",
-  ];
+  if (config.runsInWidget) {
+    if (notifyCheck != null) await notifyCheck.schedule();
 
-  let chooser = await presentAlert("Preview Widget", displays);
-  if (chooser == displays.length - 1) return;
+    let widget = await getWidget(simple, null);
+    Script.setWidget(widget);
+  } else {
+    const displays = [
+      "View Small Widget",
+      "View Medium Widget",
+      "View Large Widget",
+      "Cancel Display",
+    ];
 
-  let size = "";
-  let widget;
-  switch (displays[chooser]) {
-    case displays[0]:
-      size = "Small";
-      widget = await getWidget(simple, "small");
-      break;
-    case displays[1]:
-      size = "Medium";
-      widget = await getWidget(simple, "medium");
-      break;
-    default:
-      size = "Large";
-      widget = await getWidget(simple);
-      break;
+    let chooser = await presentAlert("Preview Widget", displays);
+    if (chooser === displays.length - 1) return;
+
+    let size = "";
+    switch (displays[chooser]) {
+      case displays[0]:
+        size = "Small";
+        break;
+      case displays[1]:
+        size = "Medium";
+        break;
+      default:
+        size = "Large";
+        break;
+    }
+    const widget = await getWidget(simple, size);
+
+    if (notifyCheck != null) await notifyCheck.schedule();
+
+    switch (size) {
+      case "Small":
+        await widget.presentSmall();
+        break;
+      case "Medium":
+        await widget.presentMedium();
+        break;
+      case "Large":
+        await widget.presentLarge();
+        break;
+    }
   }
 
-  if (notifyCheck != null) await notifyCheck.schedule();
-
-  await widget[`present${size}`]();
+  Script.complete();
 }
 
-Script.complete();
+await mainScript();
+
+// ---------Get Latest Anime ---------------
+interface AnimeInfo {
+  title: string;
+  episode: string;
+  image: string;
+  link: string;
+}
+
+async function getLatestAnime(num: number) {
+  let animeHTML = await new Request(ANIME_URL).loadString();
+  const start = '<ul class="listing items">';
+  animeHTML = animeHTML
+    .slice(
+      animeHTML.indexOf(start) + start.length,
+      animeHTML.indexOf(`<!-- end for -->`)
+    )
+    .trim();
+
+  let animesRAW = [];
+  for (let i = 0; i < num; i++) {
+    let animeRaw = animeHTML
+      .slice(
+        animeHTML.indexOf('<li class="video-block ">'),
+        animeHTML.indexOf("</li>") + 5
+      )
+      .trim();
+    animesRAW.push(animeRaw);
+    animeHTML = animeHTML.trim().substring(animeRaw.length);
+  }
+
+  let animes: AnimeInfo[] = [];
+  for (let animeRAW of animesRAW) {
+    let nameStart =
+      animeRAW.indexOf('<div class="name">') + '<div class="name">'.length;
+    let name = animeRAW.slice(nameStart);
+    name = name.slice(0, name.indexOf("</div>"));
+
+    let episode = name.slice(name.indexOf("Episode"));
+    episode = episode.replace("Episode", "Ep").trim();
+
+    name = name.slice(0, name.indexOf("Episode")).trim();
+
+    let imgUrlStart = animeRAW.indexOf("src") + 5;
+    let imgUrlEnd = animeRAW.indexOf("alt") - 2;
+    let imgUrl = animeRAW.slice(imgUrlStart, imgUrlEnd);
+
+    let urlStart = animeRAW.indexOf("href=") + 6;
+    let url = animeRAW.slice(urlStart);
+    url = url.slice(0, url.indexOf('">'));
+
+    animes.push({
+      title: name,
+      episode: episode,
+      image: imgUrl,
+      link: ANIME_URL + url,
+    });
+  }
+
+  return animes;
+}
 
 // -----------Large complex Widget---------------
-async function createLComplexWidget(data) {
+async function createLComplexWidget(data: AnimeInfo[]) {
   let widget = new ListWidget();
 
-  var refreshDate = Date.now() + 1000 * 60 * REFRESH_RATE;
+  const refreshDate = Date.now() + 1000 * 60 * REFRESH_RATE;
   widget.refreshAfterDate = new Date(refreshDate);
 
   let animeThumbnails = [];
@@ -126,7 +215,8 @@ async function createLComplexWidget(data) {
   animeStack1.layoutHorizontally();
   animeStack2.layoutHorizontally();
 
-  function animeEpPadding(epData) {
+  // sourcery skip: avoid-function-declarations-in-blocks
+  function animeEpPadding(epData: string) {
     let padding = 19;
     switch (epData.length) {
       case 5:
@@ -139,7 +229,7 @@ async function createLComplexWidget(data) {
         padding = 10;
     }
 
-    return parseFloat(padding);
+    return padding;
   }
 
   let anime2Stack1 = animeStack1.addStack();
@@ -200,7 +290,7 @@ async function createLComplexWidget(data) {
 }
 
 // -----------Large Simple Widget-------------
-async function createLSimpleWidget(data) {
+async function createLSimpleWidget(data: AnimeInfo[]) {
   let widget = new ListWidget();
 
   const latestFontSize = config.widgetFamily == "large" ? 13 : 12;
@@ -214,7 +304,7 @@ async function createLSimpleWidget(data) {
 
   const latestAnimeSize = new Size(82, 82);
 
-  var refreshDate = Date.now() + 1000 * 60 * REFRESH_RATE;
+  const refreshDate = Date.now() + 1000 * 60 * REFRESH_RATE;
   widget.refreshAfterDate = new Date(refreshDate);
 
   let latestImage = await new Request(data[0].image).loadImage();
@@ -279,77 +369,24 @@ async function createLSimpleWidget(data) {
   return widget;
 }
 
-// ---------Get Latest Anime ---------------
-async function getLatestAnime(num) {
-  let animeHTML = await new Request(ANIME_URL).loadString();
-  const start = '<ul class="listing items">';
-  animeHTML = animeHTML
-    .slice(
-      animeHTML.indexOf(start) + start.length,
-      animeHTML.indexOf(`<!-- end for -->`)
-    )
-    .trim();
-
-  let animesRAW = [];
-  for (let i = 0; i < parseInt(num); i++) {
-    let animeRaw = animeHTML
-      .slice(
-        animeHTML.indexOf('<li class="video-block ">'),
-        animeHTML.indexOf("</li>") + 5
-      )
-      .trim();
-    animesRAW.push(animeRaw);
-    animeHTML = animeHTML.trim().substring(animeRaw.length);
-  }
-
-  let animes = [];
-  for (let animeRAW of animesRAW) {
-    let nameStart =
-      animeRAW.indexOf('<div class="name">') + '<div class="name">'.length;
-    let name = animeRAW.slice(nameStart);
-    name = name.slice(0, name.indexOf("</div>"));
-
-    let episode = name.slice(name.indexOf("Episode"));
-    episode = episode.replace("Episode", "Ep").trim();
-
-    name = name.slice(0, name.indexOf("Episode")).trim();
-
-    let imgUrlStart = animeRAW.indexOf("src") + 5;
-    let imgUrlEnd = animeRAW.indexOf("alt") - 2;
-    let imgUrl = animeRAW.slice(imgUrlStart, imgUrlEnd);
-
-    let urlStart = animeRAW.indexOf("href=") + 6;
-    let url = animeRAW.slice(urlStart);
-    url = url.slice(0, url.indexOf('">'));
-
-    animes.push({
-      title: name,
-      episode: episode,
-      image: imgUrl,
-      link: ANIME_URL + url,
-    });
-  }
-
-  return animes;
-}
-
 // ---------------Other Tools-------------------
-async function getWidget(s, dim) {
+async function getWidget(simple: boolean, dim: string | null) {
   const widgetSize = config.widgetFamily || dim;
   switch (widgetSize) {
-    case "small":
-      return s ? console.log("s small widget") : console.log("small widget");
-    case "medium":
-      return s ? console.log("s medium widget") : console.log("medium widget");
     default:
-      let latestAnimes = await getLatestAnime(s ? 7 : 5);
-      return s
+      let latestAnimes = await getLatestAnime(simple ? 7 : 5);
+      return simple
         ? await createLSimpleWidget(latestAnimes)
         : await createLComplexWidget(latestAnimes);
   }
 }
 
-function addImage(stack, image, size, roundness) {
+function addImage(
+  stack: WidgetStack,
+  image: ImageType,
+  size: Size,
+  roundness: number
+) {
   let img = stack.addImage(image);
   img.imageSize = size;
   img.cornerRadius = roundness;
@@ -357,24 +394,22 @@ function addImage(stack, image, size, roundness) {
   return img;
 }
 
-async function presentAlert(prompt, items) {
+async function presentAlert(prompt: string, items: string[]) {
   let alert = new Alert();
   alert.message = prompt;
 
   for (const item of items) alert.addAction(item);
-
-  let resp = await alert.presentSheet();
-  return resp;
+  return await alert.presentSheet();
 }
 
-function addText(stack, text, font) {
+function addText(stack: WidgetStack, text: string, font: Font) {
   let stackText = stack.addText(text);
   stackText.font = font;
 
   return stackText;
 }
 
-function createNotification(data) {
+function createNotification(data: AnimeInfo[]) {
   let notif = new Notification();
   let notifT = data[0].title;
   let notifEp = data[0].episode;
@@ -387,19 +422,21 @@ function createNotification(data) {
   return notif;
 }
 
-function userAnimesLower(userAnimes) {
+function userAnimesLower(userAnimes: string[]) {
   let newUserAnimes = [];
   for (let anime of userAnimes) newUserAnimes.push(anime.toLowerCase());
   return newUserAnimes;
 }
 
-function latestAnimeCheck(newAnimes) {
+function latestAnimeCheck(newAnimes: AnimeInfo[]) {
   const currentAnimeJSON = `${FileManager.iCloud().documentsDirectory()}/animeWidget/currentAnime.json`;
   let currentAnime = newAnimes[0];
 
-  let animeFromJSON = JSON.parse(
-    FileManager.iCloud().readString(currentAnimeJSON)
-  );
+  const loadedJSON = FileManager.iCloud().readString(currentAnimeJSON);
+
+  if (!loadedJSON) throw new Error("No Current Anime JSON");
+
+  let animeFromJSON: AnimeInfo = JSON.parse(loadedJSON);
 
   let notif = null;
   if (animeFromJSON.title !== currentAnime.title) {
@@ -417,11 +454,9 @@ function latestAnimeCheck(newAnimes) {
   return notif;
 }
 
-function simpleCheck(parameters) {
+function simpleCheck(parameters: any) {
   if (parameters === null) return false;
-
-  parameters = parameters.toLowerCase();
-  if (parameters === "true") return true;
+  else return parameters.toLowerCase() === "true";
 }
 
 function notifyFileSync() {
@@ -437,16 +472,15 @@ function notifyFileSync() {
       link: "9anime",
     };
 
-    json = JSON.stringify(json);
-    fm.writeString(filePath, json);
+    fm.writeString(filePath, JSON.stringify(json));
   }
 }
 
-function getTimeRefreshStack(stack, font) {
-  let newDate = new Date();
-  let hours =
+function getTimeRefreshStack(stack: WidgetStack, font: Font) {
+  const newDate = new Date();
+  const hours =
     newDate.getHours() < 10 ? "0" + newDate.getHours() : newDate.getHours();
-  let minutes =
+  const minutes =
     newDate.getMinutes() < 10
       ? "0" + newDate.getMinutes()
       : newDate.getMinutes();
