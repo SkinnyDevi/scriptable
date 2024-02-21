@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "outDir": "./javascript",
+    "strict": true,
+    "moduleResolution": "nodenext",
+    "emitDeclarationOnly": false
+  },
+  "include": ["script.ts"],
+  "exclude": ["node_modules", "**/__tests__/*"]
+}

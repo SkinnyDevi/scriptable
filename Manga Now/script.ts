@@ -2,6 +2,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-green; icon-glyph: book-open;
 // version: 0.5.0
+// author: SkinnyDevi (GitHub)
 
 import {
   config,
@@ -114,7 +115,7 @@ async function fetchMangaInfo(mangaUrl: string): Promise<MangaInfo> {
   };
 }
 
-// -------- UTILS ----------------- //
+// -------- UTILS -------- //
 function addText(
   container: WidgetStack,
   text: string,
@@ -161,7 +162,7 @@ function getTimeRefreshStack(stack: WidgetStack, font: number) {
   addText(stack, "Last Refresh: " + hours + ":" + minutes, "left", font);
 }
 
-// -------- WIDGET ---------------- //
+// -------- WIDGET -------- //
 async function createWidget(widgetFamily: string | null) {
   widgetFamily = widgetFamily || config.widgetFamily;
   const fontSize = widgetFamily == "large" ? 14 : 10;

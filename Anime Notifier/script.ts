@@ -2,6 +2,7 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: purple; icon-glyph: hamsa;
 // version: 1.6.1
+// author: SkinnyDevi (GitHub)
 
 import {
   args,
