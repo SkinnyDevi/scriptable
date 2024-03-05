@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report any issues with the extension
+about: Report any issues with a script or widget
 title: "Bug: Issue Name"
 labels: bug
 assignees: ""
