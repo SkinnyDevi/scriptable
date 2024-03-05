@@ -1,8 +1,11 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: purple; icon-glyph: hamsa;
-// version: 1.6.1
+// version: 1.6.2
 // author: SkinnyDevi (GitHub)
+// Something not working?
+// Visit: https://github.com/SkinnyDevi/scriptable
+// https://github.com/SkinnyDevi/scriptable/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=Bug:+Issue+Name
 
 import {
   args,
@@ -30,10 +33,9 @@ const WIDGET_BG =
   "https://raw.githubusercontent.com/SkinnyDevi/scriptable/main/Anime%20Notifier/backgrounds/genericBG-u.png";
 
 async function mainScript() {
+  notifyFileSync(); // important for notifications, do not touch
   const simple = simpleCheck(args.widgetParameter);
   let notifyCheck = latestAnimeCheck(await getLatestAnime(5));
-
-  notifyFileSync(); // important for notifications, do not touch
 
   if (config.runsInWidget) {
     if (notifyCheck != null) await notifyCheck.schedule();
@@ -99,7 +101,7 @@ async function getLatestAnime(num: number) {
   animeHTML = animeHTML
     .slice(
       animeHTML.indexOf(start) + start.length,
-      animeHTML.indexOf(`<!-- end for -->`)
+      animeHTML.indexOf(`<!-- end for -->`),
     )
     .trim();
 
@@ -108,7 +110,7 @@ async function getLatestAnime(num: number) {
     let animeRaw = animeHTML
       .slice(
         animeHTML.indexOf('<li class="video-block ">'),
-        animeHTML.indexOf("</li>") + 5
+        animeHTML.indexOf("</li>") + 5,
       )
       .trim();
     animesRAW.push(animeRaw);
@@ -370,7 +372,7 @@ async function createLSimpleWidget(data: AnimeInfo[]) {
   return widget;
 }
 
-// ---------------Other Tools-------------------
+// ---------------Other Tools---------------
 async function getWidget(simple: boolean, dim: string | null) {
   const widgetSize = config.widgetFamily || dim;
   switch (widgetSize) {
@@ -386,7 +388,7 @@ function addImage(
   stack: WidgetStack,
   image: ImageType,
   size: Size,
-  roundness: number
+  roundness: number,
 ) {
   let img = stack.addImage(image);
   img.imageSize = size;
@@ -434,10 +436,8 @@ function latestAnimeCheck(newAnimes: AnimeInfo[]) {
   let currentAnime = newAnimes[0];
 
   const loadedJSON = FileManager.iCloud().readString(currentAnimeJSON);
-
   if (!loadedJSON) throw new Error("No Current Anime JSON");
-
-  let animeFromJSON: AnimeInfo = JSON.parse(loadedJSON);
+  const animeFromJSON: AnimeInfo = JSON.parse(loadedJSON);
 
   let notif = null;
   if (animeFromJSON.title !== currentAnime.title) {
@@ -448,7 +448,7 @@ function latestAnimeCheck(newAnimes: AnimeInfo[]) {
 
     FileManager.iCloud().writeString(
       currentAnimeJSON,
-      JSON.stringify(currentAnime)
+      JSON.stringify(currentAnime),
     );
   }
 
@@ -461,12 +461,14 @@ function simpleCheck(parameters: any) {
 }
 
 function notifyFileSync() {
-  let fm = FileManager.iCloud();
+  const fm = FileManager.iCloud();
   let dirPath = fm.documentsDirectory();
-  let filePath = fm.joinPath(dirPath, "/animeWidget/currentAnime.json");
+  dirPath = fm.joinPath(dirPath, "/animeWidget");
+  if (!fm.isDirectory(dirPath)) fm.createDirectory(dirPath);
 
+  const filePath = fm.joinPath(dirPath, "/currentAnime.json");
   if (!fm.fileExists(filePath)) {
-    let json = {
+    let json: AnimeInfo = {
       title: "anime",
       episode: "episode",
       image: "https://static",
