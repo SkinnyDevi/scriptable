@@ -24,6 +24,6 @@ Este widget busca en la página el precio y descuento (si hay) del product y lo 
 ## Instalacion
 1. Descarga este script desde la sección de [releases](https://github.com/SkinnyDevi/scriptable/releases) de GitHub.
 2. Abre este script para editarlo.
-3. (Optional) Reemplaza la imagen del producto en la variable `PRODUCT_IMAGE` con una URL de tu imagen preferida.
+3. (Opcional) Reemplaza la imagen del producto en la variable `PRODUCT_IMAGE` con una URL de tu imagen preferida.
 4. Asegurate que la variable `USE_ENG` esta puesta a `false`.
 5. Una vez hayas puesto el widget y seleccionado el script, pon la URL de tu producto en la zona de texto de "parametros".
