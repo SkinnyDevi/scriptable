@@ -1,7 +1,7 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-gray; icon-glyph: chart-bar;
-// version: 1.0.0
+// version: 1.0.1
 // author: SkinnyDevi (GitHub)
 
 import {
@@ -15,14 +15,15 @@ import {
   WidgetStack,
   LinearGradient,
   Request,
+  args,
 } from "nios-scriptable";
 
 // -------- USER CONFIG ------- //
-const PRODUCT_URL =
-  "https://www.elcorteingles.es/canarias/electronica/A45470166-apple-tv-4k-3-gen-wi-fi--ethernet-128gb/?color=Negro&parentProduct=A45470166&parentCategoryId=999.7624058013";
+const PRODUCT_URL: string | null = args.widgetParameter;
 
-const PRODUCT_IMAGE =
-  "https://www.apple.com/newsroom/images/product/tv/standard/4k_display_new_apple_tv_full.jpg.og.jpg";
+const PRODUCT_IMAGE = `
+https://media.istockphoto.com/id/1169630303/photo/blue-textured-background.webp?b=1&s=170667a&w=0&k=20&c=tI2xFhXqXFqMM0IvxSYY3F7LIwv450h2ch3yD-lZ9HU=
+`;
 
 const USE_ENG = false;
 const SHOW_TEXT = true;
@@ -63,7 +64,6 @@ async function mainScript() {
 
 await mainScript();
 
-// -------- PRODUCT FETCHER --------- //
 interface ProductInfo {
   has_error: boolean;
   imgUrl: string;
@@ -76,8 +76,18 @@ interface ProductInfoError {
   err_msg: string;
 }
 
+// -------- PRODUCT FETCHER --------- //
 async function productFetcher(): Promise<ProductInfo | ProductInfoError> {
-  const htmlString = await new Request(PRODUCT_URL).loadString();
+  if (PRODUCT_URL === null) {
+    return {
+      has_error: true,
+      err_msg: USE_ENG
+        ? "This text was displayed because no URL was specified."
+        : "No se ha proporcionado un enlace para buscar el producto.",
+    };
+  }
+
+  const htmlString = await new Request(PRODUCT_URL.trim()).loadString();
 
   const dataFetcher = `
     function fetchData() {
@@ -100,10 +110,9 @@ async function productFetcher(): Promise<ProductInfo | ProductInfoError> {
   `;
 
   const webview = new WebView();
-  await webview.loadHTML(htmlString, PRODUCT_URL);
+  await webview.loadHTML(htmlString, PRODUCT_URL.trim());
 
   let response = await webview.evaluateJavaScript(dataFetcher);
-  console.log(response);
 
   if (response === null) {
     return {
@@ -130,7 +139,7 @@ async function productFetcher(): Promise<ProductInfo | ProductInfoError> {
   return {
     has_error: false,
     imgUrl: imageUrl,
-    url: PRODUCT_URL,
+    url: PRODUCT_URL.trim(),
     text: `${prodName} - ${priceLabel}: ${productPrice}€
 ${discountLabel} ${discountP}%
 ${checkLabel}: ${nowRefresh}`,
@@ -188,7 +197,7 @@ async function createWidget(data: ProductInfo, widgetFamily: string | null) {
   const fontSize = 18;
 
   const widget = new ListWidget();
-  const req = new Request(data.imgUrl);
+  const req = new Request(data.imgUrl.trim());
   const img = await req.loadImage();
 
   const refreshRate = 5; // min
