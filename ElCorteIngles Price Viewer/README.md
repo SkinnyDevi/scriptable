@@ -9,9 +9,9 @@ This widget fetches the price and discount (if any) of the product of the URL an
 ## Installation
 1. Download this script from the [releases section](https://github.com/SkinnyDevi/scriptable/releases).
 2. Open the script for editing.
-3. Edit the `PRODUCT_URL` variable, keeping your product URL between the `""`.
-4. Edit the `PRODUCT_IMAGE` variable, keeping your custom image URL between the `""`.
-5. Make sure `USE_ENG` is set to `true`.
+3. (Optional) Replace the product image in the `PRODUCT_IMAGE` variable with your own custom image URL.
+4. Make sure `USE_ENG` is set to `true`.
+5. Once you set the widget on your home screen, edit the widget and paste your product URL in the parameters section.
 
 
 ## Español
@@ -24,6 +24,6 @@ Este widget busca en la página el precio y descuento (si hay) del product y lo 
 ## Instalacion
 1. Descarga este script desde la sección de [releases](https://github.com/SkinnyDevi/scriptable/releases) de GitHub.
 2. Abre este script para editarlo.
-3. Edita la variable `PRODUCT_URL` y pon la URL del producto entre las comillas `""`.
-4. Edita la variable `PRODUCT_IMAGE` y pon la URL de tu imagen escogida entre  las comillas `""`.
-5. Asegurate que la variable `USE_ENG` esta puesta a `false`.
+3. (Optional) Reemplaza la imagen del producto en la variable `PRODUCT_IMAGE` con una URL de tu imagen preferida.
+4. Asegurate que la variable `USE_ENG` esta puesta a `false`.
+5. Una vez hayas puesto el widget y seleccionado el script, pon la URL de tu producto en la zona de texto de "parametros".

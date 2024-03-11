@@ -9,6 +9,12 @@ Repository containing Scriptable scripts and iOS Widgets and Scripts made by [me
 5. Add the widget to the Home Screen.
 6. Done!
 
+## Want a custom widget/script?
+Send me an email to [skinnydevi.dev@gmail.com](mailto:skinnydevi.dev@gmail.com) with your proposal!
+
+## Want to contribute to my development?
+I appreciate your help! You can donate over on [my PayPal](https://paypal.me/skinnydevi).
+
 ## Latest releases of my widgets
 - [Anime Notifier (1.6.1)](https://github.com/SkinnyDevi/scriptable/releases/tag/anime-notifier-v1.6.1)
 - [Manga Now (0.5.0)](https://github.com/SkinnyDevi/scriptable/releases/tag/manga-now-0.5.0)
