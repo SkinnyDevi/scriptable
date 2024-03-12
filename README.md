@@ -16,7 +16,7 @@ Send me an email to [skinnydevi.dev@gmail.com](mailto:skinnydevi.dev@gmail.com) 
 I appreciate your help! You can donate over on [my PayPal](https://paypal.me/skinnydevi).
 
 ## Latest releases of my widgets
-- [Anime Notifier (1.6.1)](https://github.com/SkinnyDevi/scriptable/releases/tag/anime-notifier-v1.6.1)
+- [Anime Notifier (1.6.2)](https://github.com/SkinnyDevi/scriptable/releases/tag/anime-notifier-v1.6.2)
 - [Manga Now (0.5.0)](https://github.com/SkinnyDevi/scriptable/releases/tag/manga-now-0.5.0)
 - [ElCorteIngles Price Viewer (1.0.1)](https://github.com/SkinnyDevi/scriptable/releases/tag/elcorteingles-price-viewer-v1.0.1)
 - [Amazon Product Viewer (1.0.0)](https://github.com/SkinnyDevi/scriptable/releases/tag/amazon-product-viewer-v1.0.0)
