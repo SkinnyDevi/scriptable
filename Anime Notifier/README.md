@@ -2,7 +2,7 @@
 
 Click here for the [latest release](https://github.com/SkinnyDevi/scriptable/releases/tag/anime-notifier-v1.6.1).
 
-## Features (1.6.1)
+## Features (1.6.2)
 - Show the latest five animes with thumbnails
 - Choose to send notifications for your favourite animes with a custom user anime list
 	- To add an anime to the notification list, go to the [anime website](https://goload.pro) and copy the anime name *exactly*.
