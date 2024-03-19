@@ -1,9 +1,9 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: orange; icon-glyph: chart-bar;
-// version: 1.0.0
+// version: 1.0.1
 // author: SkinnyDevi (GitHub)
-//import { config, Script, ListWidget, Font, WebView, Color, Alert, LinearGradient, Request, args, } from "nios-scriptable";
+// import { config, Script, ListWidget, Font, Color, Alert, LinearGradient, Request, args, } from "nios-scriptable";
 // -------- USER CONFIG ------- //
 const PRODUCT_URL = args.widgetParameter;
 const WIDGET_BG = `
@@ -54,58 +54,41 @@ async function productFetcher() {
     };
   }
   const htmlString = await new Request(PRODUCT_URL.trim()).loadString();
-  const dataFetcher = `
-		function fetchAmazonData() {
-			const productTitle = document.getElementById("productTitle").innerHTML;
-
-			let price = document.querySelector("#corePrice_feature_div > div > div > span.a-price.aok-align-center > span.a-offscreen");
-
-			if (price === null) {
-				const symbol = document.querySelector("span.a-price-symbol").innerHTML;
-				const whole = document.querySelector("span.a-price-whole").innerText;
-				const fraction = document.querySelector("span.a-price-fraction").innerHTML;
-				price = whole + fraction + symbol;
-			} else {
-				price = price.innerText;
-			}
-
-			const imgUrl = document.querySelector("#imgTagWrapperId > img").src;
-
-			const perc = document.querySelector("span.savingsPercentage");
-			let percentage = '0';
-			if (perc !== null) {
-				const percRaw = document.querySelector("span.savingsPercentage").innerText.split('');
-      	percentage = percRaw.slice(1, 3).join('');
-			}
-
-			const data = {
-				imgUrl: imgUrl,
-				price: price,
-				text: productTitle,
-				discount: percentage
-			};
-
-			return JSON.stringify(data);
-		}
-
-		fetchAmazonData();
-	`;
-  const webview = new WebView();
-  await webview.loadHTML(htmlString, PRODUCT_URL.trim());
-  let response = await webview.evaluateJavaScript(dataFetcher);
-  if (response === null) {
-    return {
-      has_error: true,
-      err_msg: "This text is displayed because there was an error",
-    };
-  }
-  response = JSON.parse(response);
-  console.log(response);
-  const prodName = response.text.substr(0, 21).trim();
-  const productPrice = response.price;
-  const discountP = response.discount;
-  const imageUrl =
-    (USE_CUSTOM_IMAGE ? WIDGET_BG : response.imgUrl) || WIDGET_BG;
+  const moneySymbol = sliceFromString(
+    htmlString,
+    'class="a-price-symbol"',
+    1,
+    1
+  );
+  const mainPrice = sliceFromString(
+    htmlString,
+    'class="a-price-whole"',
+    1,
+    9,
+    true
+  );
+  const decimalPrice = sliceFromString(
+    htmlString,
+    'class="a-price-fraction"',
+    1,
+    2
+  );
+  const productTitle = sliceFromString(
+    htmlString,
+    'id="productTitle"',
+    47,
+    999999,
+    true
+  );
+  const imgTag = sliceFromString(htmlString, 'id="imgTagWrapperId"', 20, 500);
+  const imgUrl = sliceFromString(imgTag, 'src="', 0, 100, true, '"');
+  const discountPercent = parseInt(
+    sliceFromString(htmlString, "savingsPercentage", 3, 3, true)
+  );
+  const prodName = productTitle.substr(0, 21).trim();
+  const productPrice = mainPrice + "." + decimalPrice + moneySymbol;
+  const discountP = discountPercent > 0 ? discountPercent : 0;
+  const imageUrl = (USE_CUSTOM_IMAGE ? WIDGET_BG : imgUrl) || WIDGET_BG;
   const now = new Date();
   const nowRefresh = now.toLocaleTimeString();
   const priceLabel = USE_ENG ? "Price" : "Precio";
@@ -152,6 +135,21 @@ async function presentAlert(prompt, items, asSheet) {
     alert.addAction(item);
   }
   return asSheet ? await alert.presentSheet() : await alert.presentAlert();
+}
+function sliceFromString(
+  baseStr,
+  str,
+  startIndexOffset,
+  strLength,
+  removeEndOfTextTag = false,
+  customSeparatorString = "<"
+) {
+  const starter = baseStr.indexOf(str);
+  const startIndex = starter + str.length + startIndexOffset;
+  const sliced = baseStr.slice(startIndex, startIndex + strLength);
+  return removeEndOfTextTag
+    ? sliced.split(customSeparatorString)[0].trim()
+    : sliced.trim();
 }
 // -------- WIDGET -------- //
 async function createWidget(data, widgetFamily) {
